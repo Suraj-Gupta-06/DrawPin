@@ -1,0 +1,31 @@
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # In local dev, Redis is optional.
+  # The health indicator is disabled so /actuator/health stays UP even when
+  # Redis is not running on your machine.
+  # ─────────────────────────────────────────────────────────────────────────
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+
+management:
+  health:
+    redis:
+      enabled: false   # Do not report Redis as DOWN in local dev
+    mail:
+      enabled: false   # Do not report Mail (SMTP) as DOWN in local dev
+
+logging:
+  level:
+    com.drawpin: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

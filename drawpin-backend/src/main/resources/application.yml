@@ -1,0 +1,171 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api/v1
+  error:
+    include-message: never          # Never expose raw error messages in prod
+    include-stacktrace: never
+
+spring:
+  application:
+    name: drawpin-backend
+
+  # ─────────────────────────────────────────────────────────
+  # JACKSON
+  # ─────────────────────────────────────────────────────────
+  jackson:
+    mapper:
+      accept-case-insensitive-enums: true
+
+  # ─────────────────────────────────────────────────────────
+  # DATASOURCE
+  # ─────────────────────────────────────────────────────────
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/drawpin}
+    username: ${DATABASE_USER:drawpin}
+    password: ${DATABASE_PASSWORD:drawpin_secret}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+      pool-name: DrawPinHikariPool
+
+  # ─────────────────────────────────────────────────────────
+  # JPA / HIBERNATE
+  # ─────────────────────────────────────────────────────────
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate            # Flyway owns DDL — Hibernate only validates
+    show-sql: false
+    open-in-view: false             # Prevent lazy-loading surprises in web layer
+    properties:
+      hibernate:
+        format_sql: false
+        use_sql_comments: false
+        jdbc:
+          batch_size: 25
+          order_inserts: true
+          order_updates: true
+
+  # ─────────────────────────────────────────────────────────
+  # FLYWAY
+  # ─────────────────────────────────────────────────────────
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+    validate-on-migrate: true
+    out-of-order: false
+
+  # ─────────────────────────────────────────────────────────
+  # REDIS
+  # ─────────────────────────────────────────────────────────
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 2
+
+  # ─────────────────────────────────────────────────────────
+  # MAIL
+  # ─────────────────────────────────────────────────────────
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:noreply@drawpin.com}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+  # ─────────────────────────────────────────────────────────
+  # ASYNC (for email dispatch)
+  # ─────────────────────────────────────────────────────────
+  task:
+    execution:
+      pool:
+        core-size: 4
+        max-size: 16
+        queue-capacity: 50
+      thread-name-prefix: drawpin-async-
+
+# ─────────────────────────────────────────────────────────────
+# DRAWPIN CUSTOM PROPERTIES
+# ─────────────────────────────────────────────────────────────
+drawpin:
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
+
+  jwt:
+    secret: ${JWT_SECRET:ThisIsADevelopmentSecretKeyForDrawPinBackendMustBeAtLeast64CharactersLong123456789}
+    access-token-expiry-seconds: 900           # 15 minutes
+    refresh-token-expiry-seconds: 1209600      # 14 days
+    remember-me-expiry-seconds: 2592000        # 30 days
+
+  cloudinary:
+    cloud-name: ${CLOUDINARY_CLOUD_NAME:drawpin}
+    api-key: ${CLOUDINARY_API_KEY:}
+    api-secret: ${CLOUDINARY_API_SECRET:}
+
+  stripe:
+    secret-key: ${STRIPE_SECRET_KEY:}
+    webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
+    publishable-key: ${STRIPE_PUBLISHABLE_KEY:}
+
+  platform-fee-percent: 10
+  min-payout-cents: 1000
+  escrow-clear-days: 7
+  max-login-attempts: 5
+  lockout-duration-minutes: 15
+  password-reset-expiry-hours: 1
+  email-verification-expiry-hours: 24
+  password-reset-rate-limit-minutes: 5
+
+# ─────────────────────────────────────────────────────────────
+# ACTUATOR
+# ─────────────────────────────────────────────────────────────
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# ─────────────────────────────────────────────────────────────
+# SPRINGDOC / SWAGGER
+# ─────────────────────────────────────────────────────────────
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    disable-swagger-default-url: true
+  show-actuator: false
+
+# ─────────────────────────────────────────────────────────────
+# LOGGING
+# ─────────────────────────────────────────────────────────────
+logging:
+  level:
+    root: INFO
+    com.drawpin: DEBUG
+    org.springframework.security: INFO
+    org.hibernate.SQL: OFF
