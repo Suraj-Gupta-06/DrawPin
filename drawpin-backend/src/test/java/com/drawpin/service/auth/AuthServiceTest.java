@@ -12,6 +12,8 @@ import com.drawpin.dto.response.AuthResult;
 import com.drawpin.exception.ConflictException;
 import com.drawpin.exception.UnauthorizedException;
 import com.drawpin.exception.ValidationException;
+import com.drawpin.mapper.UserMapper;
+import com.drawpin.repository.CreatorRepository;
 import com.drawpin.repository.UserRepository;
 import com.drawpin.repository.UserSettingsRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,6 +51,9 @@ class AuthServiceTest {
     @Mock private EmailVerificationService emailVerificationService;
     @Mock private EmailService emailService;
     @Mock private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private CreatorRepository creatorRepository;
 
     @InjectMocks
     private AuthService authService;

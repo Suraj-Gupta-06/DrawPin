@@ -104,9 +104,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, PUBLIC_POST_PATHS).permitAll()
                         // Public read-only browse endpoints
                         .requestMatchers(HttpMethod.GET,
-                                "/pins/**",
-                                "/creators/**",
-                                "/categories/**"
+                                "/api/v1/pins/**",
+                                "/api/v1/creators/**",
+                                "/api/v1/categories/**",
+                                "/api/v1/media/**"
                         ).permitAll()
                         // Everything else requires authentication
                         .anyRequest().authenticated()

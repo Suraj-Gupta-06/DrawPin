@@ -12,6 +12,7 @@ import com.drawpin.exception.ConflictException;
 import com.drawpin.exception.ResourceNotFoundException;
 import com.drawpin.exception.UnauthorizedException;
 import com.drawpin.exception.ValidationException;
+import com.drawpin.repository.CreatorRepository;
 import com.drawpin.repository.UserRepository;
 import com.drawpin.repository.UserSettingsRepository;
 import com.drawpin.util.SlugUtils;
@@ -69,6 +70,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final UserSettingsRepository userSettingsRepository;
+    private final CreatorRepository creatorRepository;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final EmailVerificationService emailVerificationService;
@@ -408,7 +410,8 @@ public class AuthService {
                 .website(user.getWebsite())
                 .isVerified(user.isVerified())
                 .emailVerified(user.isEmailVerified())
-                .creatorProfileId(null) // Populated in Phase 2
+                .creatorProfileId(creatorRepository.findByUserId(user.getId())
+                        .map(com.drawpin.domain.entity.Creator::getId).orElse(null))
                 .build();
     }
 }

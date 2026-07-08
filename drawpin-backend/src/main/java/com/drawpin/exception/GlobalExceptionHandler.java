@@ -15,6 +15,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -175,6 +176,24 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(ApiResponse.fail(ErrorResponse.of(
                         "AUTHENTICATION_FAILED", "Authentication failed.")));
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // FILE UPLOAD EXCEPTIONS
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Handles Spring's {@link MaxUploadSizeExceededException} for file uploads.
+     *
+     * @param ex the exception
+     * @return 413 PAYLOAD_TOO_LARGE
+     */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMaxUploadSizeExceeded(MaxUploadSizeExceededException ex) {
+        return ResponseEntity
+                .status(HttpStatus.PAYLOAD_TOO_LARGE)
+                .body(ApiResponse.fail(ErrorResponse.of(
+                        "FILE_TOO_LARGE", "The uploaded file exceeds the maximum allowed size (10MB).")));
     }
 
     // ─────────────────────────────────────────────────────────────────────────
